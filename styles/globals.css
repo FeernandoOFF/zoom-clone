@@ -6,11 +6,17 @@ body {
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
-
 * {
   box-sizing: border-box;
+}
+
+#App {
+  background: var(--primary-bg);
+  min-height: 100vh;
+}
+:root {
+  --primary-bg: #062343;
+  --secondary-bg: #2d4866;
+
+  --third-bg: #fe9161;
 }

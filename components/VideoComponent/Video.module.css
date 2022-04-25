@@ -1,0 +1,7 @@
+.video {
+  border-radius: 20px;
+  background: rebeccapurple;
+  width: 450px;
+  height: 400px;
+  display: inline-block;
+}

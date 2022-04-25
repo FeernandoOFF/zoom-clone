@@ -1,3 +1,24 @@
-.message {
-  background: #ff0000;
+.videoGrid {
+  display: grid;
+  color: white;
+  background: blue;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+.meetingContainer {
+  background: transparent;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  min-height: 92vh;
+  gap: 10px;
+}
+
+.messageContainer {
+  color: white;
+  display: grid;
+  grid-template-rows: 200px 1fr;
+  gap: 10px;
+  border-radius: 20px;
+  padding: 10px;
 }
