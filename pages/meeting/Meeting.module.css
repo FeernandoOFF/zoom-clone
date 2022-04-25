@@ -1,9 +1,10 @@
 .videoGrid {
   display: grid;
-  color: white;
-  background: blue;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  background: var(--secondary-bg);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  border-radius: 20px;
 }
 .meetingContainer {
   background: transparent;

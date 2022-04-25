@@ -2,4 +2,41 @@
   padding: 20px;
   border-radius: 10px;
   background: var(--secondary-bg);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.messages::-webkit-scrollbar {
+  width: 8px;
+}
+.messages::-webkit-scrollbar-track {
+  background: rgba(59, 59, 184, 0.388);
+  border-radius: 10px;
+  width: 5px;
+}
+/* .messages::-webkit-scrollbar-button {
+  background: coral;
+} */
+.messages::-webkit-scrollbar-thumb {
+  border-radius: 10px;
+  background: var(--primary-bg);
+}
+
+.messages {
+  overflow-y: scroll;
+  max-height: 500px;
+}
+
+.input {
+  width: 100%;
+}
+.formulary {
+  width: 100%;
+}
+.formulary > input {
+  background: none;
+  padding: 15px 10px;
+  width: 100%;
+  border: 2px rgba(255, 255, 255, 0.372) solid;
+  border-radius: 10px;
 }

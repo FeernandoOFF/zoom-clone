@@ -1,7 +1,13 @@
 .video {
   border-radius: 20px;
-  background: rebeccapurple;
-  width: 450px;
-  height: 400px;
-  display: inline-block;
+  background: gray;
+  flex: 1;
+  max-height: 500px;
+  object-fit: fill;
+  width: 100%;
+}
+
+.video :nth-child(1) {
+  flex: 0 0 100%;
+  background: red;
 }
