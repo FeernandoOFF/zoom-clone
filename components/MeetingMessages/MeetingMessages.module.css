@@ -25,6 +25,7 @@
 .messages {
   overflow-y: scroll;
   max-height: 500px;
+  min-height: 500px;
 }
 
 .input {
