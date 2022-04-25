@@ -12,7 +12,7 @@ function Meeting() {
   const [socket, setSocket] = useState<any>(null);
   const [peer, setPeer] = useState<any>(null);
 
-  const [error, setError] = useState<boolean>(false);
+  const [messages, setMessages] = useState<string[]>([]);
 
   const [streams, setStreams] = useState<MediaStream[]>([]);
   // const videoRef = useRef(null);
@@ -24,6 +24,13 @@ function Meeting() {
   const socketInitializer = async () => {
     await fetch(`/api`);
     setSocket(io());
+  };
+
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    setMessages([...messages, e.target[0].value]);
+    socket.emit('message', e.target[0].value);
+    e.target[0].value = '';
   };
 
   useEffect((): any => {
@@ -75,6 +82,9 @@ function Meeting() {
       console.log('connected! :3');
     });
 
+    socket.on('message', (msg: string) => {
+      setMessages([...messages, msg]);
+    });
     // * User join room and Call him
 
     socket.on('user-connected', (userId: any) => {
@@ -102,13 +112,16 @@ function Meeting() {
     <div className={styles.meetingContainer}>
       <div className={styles.videoGrid}>
         {streams?.map((s, i) => (
-          // <p key={i}>{i}</p>
           <VideoComponent stream={s} key={i} muted={i === 0} />
         ))}
       </div>
       <div className={styles.messageContainer}>
         <UserList />
-        <MeetingMessages />
+        <MeetingMessages
+          messages={messages}
+          setMessages={setMessages}
+          handleSubmit={handleSubmit}
+        />
       </div>
     </div>
   );

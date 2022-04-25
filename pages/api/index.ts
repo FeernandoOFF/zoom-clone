@@ -18,6 +18,9 @@ const SocketHandler = (req: any, res: any) => {
       socket.on('join-room', ({ roomId, id }) => {
         socket.join(roomId);
         socket.broadcast.to(roomId).emit('user-connected', id);
+        socket.on('message', (msg) => {
+          socket.broadcast.to(roomId).emit('message', msg);
+        });
         // socket.to(roomId).broadcast.emit('user-connected', userId);
 
         socket.on('disconnect', () => {
