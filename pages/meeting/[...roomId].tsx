@@ -1,40 +1,61 @@
 import styles from './Meeting.module.css';
 import VideoComponent from '../../components/VideoComponent';
 import { peerConfig } from '../../utils/types/config';
+import { IMessage } from '../../utils/types/MessageType';
 
+import { v4 as uuidv4 } from 'uuid';
 import { useRouter } from 'next/router';
 import React, { useEffect, useRef, useState } from 'react';
 import { io } from 'socket.io-client';
 import UserList from '../../components/UserList';
 import MeetingMessages from '../../components/MeetingMessages';
+import VerifyName from '../../components/VerifyName';
+import NameInput from '../../components/NameInput';
+import { useName } from '../../utils/types/useName';
 
-function Meeting() {
+function MeetingRoom() {
+  // * Sockets and Peers
   const [socket, setSocket] = useState<any>(null);
   const [peer, setPeer] = useState<any>(null);
 
-  const [messages, setMessages] = useState<string[]>([]);
+  // * App Variables
 
   const [streams, setStreams] = useState<MediaStream[]>([]);
-  // const videoRef = useRef(null);
+  const [userName, setUserName] = useName();
+  const [messages, setMessages] = useState<IMessage[]>([]);
+  const [usersInCall, setUsersInCall] = useState<string[]>([]);
 
+  // * ROOM ID
   const {
     query: { roomId },
   } = useRouter();
 
+  // * Socket connection Promise
   const socketInitializer = async () => {
     await fetch(`/api`);
     setSocket(io());
   };
 
-  const handleSubmit = (e: any) => {
+  const handleMessageSubmit = (e: any) => {
     e.preventDefault();
-    setMessages([...messages, e.target[0].value]);
-    socket.emit('message', e.target[0].value);
+
+    const newMessage: IMessage = {
+      user: userName,
+      message: e.target[0].value,
+      uuid: uuidv4(),
+    };
+    console.log(newMessage);
+    setMessages([...messages, newMessage]);
+
+    socket.emit('message', newMessage);
+
     e.target[0].value = '';
   };
 
   useEffect((): any => {
+    if (!useName) return;
     socketInitializer().then(() => {
+      // * If not have acces to camera, the app does not crash
       if (
         'mediaDevices' in navigator &&
         'getUserMedia' in navigator.mediaDevices
@@ -42,19 +63,19 @@ function Meeting() {
         navigator.mediaDevices
           .getUserMedia({ video: true, audio: true })
           .then((currentStream) => {
-            // videoRef.current.srcObject = currentStream;
+            // * The first stream is OURS
             setStreams([currentStream]);
 
             import('peerjs').then(({ default: Peer }) => {
               const myPeer = new Peer(undefined, peerConfig);
+              // * Set the Peer to Global Scope
               setPeer(myPeer);
             });
           });
-      } else {
-        setError(true);
       }
+      // ! TODO: Error handler for CAMERA not Avialable
     });
-  }, []);
+  }, [userName]);
 
   useEffect(() => {
     if (!socket?.on) return;
@@ -64,7 +85,10 @@ function Meeting() {
     //  * After peer connected Emit an event in a room
     peer.on('open', (myId: string) => {
       console.log('Conectado a Peer y con id ' + myId);
-      socket.emit('join-room', { roomId, id: myId });
+      // * Trying to Join a Room wich triggers the event user-join
+
+      setUsersInCall([userName]); // Add us to the call Array
+      socket.emit('join-room', { roomId, id: myId, userName });
 
       // * ANSWER CALL
 
@@ -78,36 +102,62 @@ function Meeting() {
       });
     });
 
+    // TODO: Show a success Message
+
     socket.on('connect', () => {
       console.log('connected! :3');
     });
 
-    socket.on('message', (msg: string) => {
+    // * New Message , Add to message List
+    socket.on('message', (msg: IMessage) => {
       setMessages([...messages, msg]);
     });
+
     // * User join room and Call him
+    socket.on(
+      'user-connected',
+      ({
+        id: userId,
+        userName: newUserName,
+      }: {
+        id: string;
+        userName: string;
+      }) => {
+        // TODO: Add to User List
+        console.log('user connected', userId, newUserName);
+        setUsersInCall([...usersInCall, newUserName]);
+        //  * Try to call the user
+        callUser(userId, streams[0]);
+      }
+    );
 
-    socket.on('user-connected', (userId: any) => {
-      console.log('user connected', userId);
-      //  * Try to call the user
-      callUser(userId, streams[0]);
-    });
-
-    // * Call And Add the stream to The array
-
+    // * Call And Add the stream to The array (FUNCTION)
     const callUser = (userId: string, stream: MediaStream) => {
-      console.log('Trying to call: ', userId, ' ', stream);
       const userCall = peer.call(userId, streams[0]);
       userCall.on('stream', (userVideo: MediaStream) => {
         addVideo(userVideo);
       });
     };
 
+    // * Abstraction if need More info at the time of adding a Video (FUNCTION)
     const addVideo = (stream: MediaStream) => {
       setStreams([...streams, stream]);
     };
-  }, [socket, peer, streams, setStreams, roomId]);
+  }, [
+    socket,
+    peer,
+    streams,
+    setStreams,
+    roomId,
+    messages,
+    setMessages,
+    usersInCall,
+    setUsersInCall,
+  ]);
 
+  // * ASK FOR NAME BEFORE SHOWING INTERFACE
+
+  if (!userName) return <NameInput setName={setUserName} />;
   return (
     <div className={styles.meetingContainer}>
       <div className={styles.videoGrid}>
@@ -116,15 +166,20 @@ function Meeting() {
         ))}
       </div>
       <div className={styles.messageContainer}>
-        <UserList />
+        <UserList users={usersInCall} />
         <MeetingMessages
           messages={messages}
+          userName={userName}
           setMessages={setMessages}
-          handleSubmit={handleSubmit}
+          handleSubmit={handleMessageSubmit}
         />
       </div>
     </div>
   );
 }
 
-export default Meeting;
+export default MeetingRoom;
+
+function Meeting() {
+  return <div>Hi</div>;
+}

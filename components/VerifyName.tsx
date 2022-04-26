@@ -6,7 +6,7 @@ type Props = {
 };
 
 function VerifyName({ children }: Props) {
-  const [name, setName] = useState('');
+  const [name, setName] = useState<string>('');
 
   useEffect(() => {
     const storedName = localStorage.getItem('name');
@@ -21,7 +21,7 @@ function VerifyName({ children }: Props) {
     // Checking isValidElement is the safe way and avoids a typescript
     // error too.
     if (React.isValidElement(child)) {
-      return React.cloneElement(child, { name });
+      return React.cloneElement(child, { userName: name });
     }
     return child;
   });

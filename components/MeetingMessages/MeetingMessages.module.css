@@ -40,4 +40,25 @@
   width: 100%;
   border: 2px rgba(255, 255, 255, 0.372) solid;
   border-radius: 10px;
+  color: white;
+}
+
+.basicMessage {
+  border-radius: 10px;
+  width: 90%;
+  padding: 6px 20px;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+.message {
+  background: #c8915a;
+  margin-right: auto;
+  text-align: left;
+}
+
+.ownMessage {
+  text-align: right;
+  background: #2d6652;
+  margin-left: auto;
 }

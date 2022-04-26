@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './NameInput.module.css';
 
 type Props = {
-  setName: any;
+  setName?: any;
 };
 
 function NameInput({ setName }: Props) {
@@ -10,7 +10,7 @@ function NameInput({ setName }: Props) {
     e.preventDefault();
     const name = e.target[0].value;
     localStorage.setItem('name', name);
-    setName(name);
+    if (setName) setName(name);
   };
 
   return (
